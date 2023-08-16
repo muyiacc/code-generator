@@ -71,6 +71,7 @@ public class BuildBase {
         } catch (Exception e) {
             logger.info("生成基础类:{},失败:", fileName, e);
         } finally {
+            // 关闭流
             ConnectionUtils.close(bw, osw, os, br, isr, is);
         }
     }

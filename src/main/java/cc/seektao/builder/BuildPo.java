@@ -3,6 +3,7 @@ package cc.seektao.builder;
 import cc.seektao.bean.Constants;
 import cc.seektao.bean.FieldInfo;
 import cc.seektao.bean.TableInfo;
+import cc.seektao.utils.ConnectionUtils;
 import cc.seektao.utils.DateUtils;
 import cc.seektao.utils.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -18,6 +19,8 @@ public class BuildPo {
     private static final Logger logger = LoggerFactory.getLogger(BuildPo.class);
 
     public static void execute(TableInfo tableInfo) {
+
+        // 创建文件夹
         File folder = new File(Constants.PATH_PO);
         if (!folder.exists()) {
             folder.mkdirs();
@@ -32,6 +35,7 @@ public class BuildPo {
             osw = new OutputStreamWriter(os);
             bw = new BufferedWriter(osw);
 
+            // 导入包
             bw.write("package " + Constants.PACKAGE_PO + ";");
             bw.newLine();
             bw.newLine();
@@ -70,6 +74,7 @@ public class BuildPo {
             bw.write("public class " + tableInfo.getBeanName() + " implements Serializable {");
             bw.newLine();
 
+            // 添加属性和及其注解
             for (FieldInfo fieldInfo : tableInfo.getFieldList()) {
                 BuildComment.createFieldComment(bw, fieldInfo.getComment());
                 // 添加日期序列化
@@ -155,29 +160,8 @@ public class BuildPo {
         } catch (Exception e) {
             logger.info("创建po失败" + e);
         } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            if (osw != null) {
-                try {
-                    osw.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            // 关闭流
+            ConnectionUtils.close(bw, osw, os);
         }
-
-
     }
 }

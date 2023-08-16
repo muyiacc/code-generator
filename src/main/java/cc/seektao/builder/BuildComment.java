@@ -13,6 +13,7 @@ import java.util.Date;
  * 增加注释
  */
 public class BuildComment {
+    // 添加类的注释
     public static void createClassComment(BufferedWriter bw, String classComment) throws IOException {
         bw.write("/**");
         bw.newLine();
@@ -25,6 +26,7 @@ public class BuildComment {
         bw.write(" */");
         bw.newLine();
     }
+    // 添加属性的注释
     public static void createFieldComment(BufferedWriter bw, String fieldComment) throws IOException {
         bw.write("\t/**");
         bw.newLine();
@@ -33,6 +35,7 @@ public class BuildComment {
         bw.write("\t */");
         bw.newLine();
     }
+    // 添加方法的注释
     public static void createMethodComment(BufferedWriter bw){
 
     }

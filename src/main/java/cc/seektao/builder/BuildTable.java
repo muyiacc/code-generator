@@ -3,6 +3,7 @@ package cc.seektao.builder;
 import cc.seektao.bean.Constants;
 import cc.seektao.bean.FieldInfo;
 import cc.seektao.bean.TableInfo;
+import cc.seektao.utils.ConnectionUtils;
 import cc.seektao.utils.PropertiesUtils;
 import cc.seektao.utils.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -59,7 +60,7 @@ public class BuildTable {
                 tableInfo.setTableName(tableName);
                 tableInfo.setBeanName(beanName);
                 tableInfo.setComment(comment);
-                tableInfo.setBeanParamName(beanName + Constants.SUFFIX_BEAN_PARAM);
+                tableInfo.setBeanParamName(beanName + Constants.SUFFIX_BEAN_QUERY);
 
                 readFieldInfo(tableInfo);
 
@@ -70,24 +71,16 @@ public class BuildTable {
         } catch (Exception e) {
             logger.error("读取表失败", e);
         } finally {
-            if (rs != null){
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            if (ps != null){
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            ConnectionUtils.close(rs, ps, conn);
         }
         return tableInfoList;
     }
 
+    /**
+     * 处理从数据库中读取的字段，转换成需要的格式
+     * @param tableInfo
+     * @return
+     */
     private static List<FieldInfo> readFieldInfo(TableInfo tableInfo){
         PreparedStatement ps = null;
         ResultSet fieldResult = null;
@@ -131,24 +124,15 @@ public class BuildTable {
         } catch (Exception e) {
             logger.error("读取表失败", e);
         } finally {
-            if (fieldResult != null){
-                try {
-                    fieldResult.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            if (ps != null){
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            ConnectionUtils.close(fieldResult, ps);
         }
         return fieldInfoList;
     }
 
+    /**
+     * 获取索引
+     * @param tableInfo
+     */
     private static void getKeyIndexInfo(TableInfo tableInfo){
         PreparedStatement ps = null;
         ResultSet fieldResult = null;
@@ -176,35 +160,21 @@ public class BuildTable {
                     keyFieldList = new ArrayList<>();
                     tableInfo.getKeyIndexMap().put(keyName, keyFieldList);
                 }
-
-//                for (FieldInfo fieldInfo :
-//                        tableInfo.getFieldList()) {
-//                    if (fieldInfo.getFieldName().equals(columnName)) {
-//                        keyFieldList.add(fieldInfo);
-//                    }
-//                }
                 keyFieldList.add(tmpMap.get(columnName));
             }
         } catch (Exception e) {
             logger.error("读取索引失败", e);
         } finally {
-            if (fieldResult != null){
-                try {
-                    fieldResult.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            if (ps != null){
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            ConnectionUtils.close(fieldResult, ps);
         }
     }
 
+    /**
+     * 处理字段，将数据库对应的字段命名 转换成 java中规范的字段命名
+     * @param field
+     * @param upperCaseFirstLetter
+     * @return
+     */
     private static String processField(String field,Boolean upperCaseFirstLetter){
         StringBuilder sb = new StringBuilder();
         String[] fields = field.split("_");
@@ -215,6 +185,11 @@ public class BuildTable {
         return sb.toString();
     }
 
+    /**
+     * 将数据库对应的类型转换成java中的类型
+     * @param type
+     * @return
+     */
     private static String processJavaType(String type){
         if (ArrayUtils.contains(Constants.SQL_INTEGER_TYPES, type)){
             return "Integer";
