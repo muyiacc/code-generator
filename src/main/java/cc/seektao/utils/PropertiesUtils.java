@@ -1,10 +1,11 @@
-package cc.seektao.codegenerator.utils;
+package cc.seektao.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,7 +17,7 @@ public class PropertiesUtils {
         InputStream is = null;
         try {
             is = PropertiesUtils.class.getClassLoader().getResourceAsStream("application.properties");
-            props.load(is);
+            props.load(new InputStreamReader(is, StandardCharsets.UTF_8));
 
             Iterator<Object> iterator = props.keySet().iterator();
             while (iterator.hasNext()){

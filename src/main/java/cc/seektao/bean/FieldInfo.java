@@ -1,4 +1,4 @@
-package cc.seektao.codegenerator.bean;
+package cc.seektao.bean;
 
 public class FieldInfo {
     /**

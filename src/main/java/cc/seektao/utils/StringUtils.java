@@ -1,4 +1,4 @@
-package cc.seektao.codegenerator.utils;
+package cc.seektao.utils;
 
 public class StringUtils {
     public static  String upperCaseFieldFirstLetter(String field){

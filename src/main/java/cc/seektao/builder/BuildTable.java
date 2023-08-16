@@ -1,20 +1,20 @@
-package cc.seektao.codegenerator.builder;
+package cc.seektao.builder;
 
-import cc.seektao.codegenerator.bean.Constants;
-import cc.seektao.codegenerator.bean.FieldInfo;
-import cc.seektao.codegenerator.bean.TableInfo;
-import cc.seektao.codegenerator.utils.JsonUtils;
-import cc.seektao.codegenerator.utils.PropertiesUtils;
-import cc.seektao.codegenerator.utils.StringUtils;
+import cc.seektao.bean.Constants;
+import cc.seektao.bean.FieldInfo;
+import cc.seektao.bean.TableInfo;
+import cc.seektao.utils.PropertiesUtils;
+import cc.seektao.utils.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
+/**
+ * 生成表
+ */
 public class BuildTable {
     private static Connection conn = null;
     private static final Logger logger = LoggerFactory.getLogger(BuildTable.class);
@@ -54,7 +54,6 @@ public class BuildTable {
                     beanName = tableName.substring(tableName.indexOf("_")+1);
                 }
                 beanName = processField(beanName, true);
-//                logger.info(beanName);
 
                 TableInfo tableInfo = new TableInfo();
                 tableInfo.setTableName(tableName);
@@ -66,7 +65,7 @@ public class BuildTable {
 
                 getKeyIndexInfo(tableInfo);
 
-                logger.info("tableInfo:{}", JsonUtils.convertObjectToJson(tableInfo));
+                tableInfoList.add(tableInfo);
             }
         } catch (Exception e) {
             logger.error("读取表失败", e);
@@ -89,7 +88,7 @@ public class BuildTable {
         return tableInfoList;
     }
 
-    private static void readFieldInfo(TableInfo tableInfo){
+    private static List<FieldInfo> readFieldInfo(TableInfo tableInfo){
         PreparedStatement ps = null;
         ResultSet fieldResult = null;
 
@@ -103,7 +102,7 @@ public class BuildTable {
                 String extra = fieldResult.getString("extra");
                 String comment = fieldResult.getString("comment");
 
-                if (type.indexOf("(")>0){
+                if (type.indexOf("(") > 0){
                     type = type.substring(0, type.indexOf("("));
                 }
                 String propertyName = processField(field, false);
@@ -114,24 +113,18 @@ public class BuildTable {
                 fieldInfo.setFieldName(field);
                 fieldInfo.setComment(comment);
                 fieldInfo.setSqlType(type);
-                fieldInfo.setAutoIncrement("".equalsIgnoreCase(extra) ? true : false);
+                fieldInfo.setAutoIncrement("auto_increment".equalsIgnoreCase(extra) ? true : false);
                 fieldInfo.setPropertyName(propertyName);
                 fieldInfo.setJavaType(processJavaType(type));
 
-                if (ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPE, type)){
+                if (ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES, type)){
                     tableInfo.setHavaDateTime(true);
-                }else {
-                    tableInfo.setHavaDateTime(false);
                 }
-                if (ArrayUtils.contains(Constants.SQL_DATE_TYPES, type)){
-                    tableInfo.setHavaDateTime(true);
-                }else {
-                    tableInfo.setHavaDateTime(false);
+                if (ArrayUtils.contains(Constants.SQL_DATE_TYPE, type)){
+                    tableInfo.setHavaDate(true);
                 }
-                if (ArrayUtils.contains(Constants.SQL_DECIMAL_TYPE, type)){
+                if (ArrayUtils.contains(Constants.SQL_DECIMAL_TYPES, type)){
                     tableInfo.setHavaBigDecimal(true);
-                }else{
-                    tableInfo.setHavaBigDecimal(false);
                 }
             }
             tableInfo.setFieldList(fieldInfoList);
@@ -153,14 +146,21 @@ public class BuildTable {
                 }
             }
         }
+        return fieldInfoList;
     }
 
-    private static List<FieldInfo> getKeyIndexInfo(TableInfo tableInfo){
+    private static void getKeyIndexInfo(TableInfo tableInfo){
         PreparedStatement ps = null;
         ResultSet fieldResult = null;
 
         List<FieldInfo> fieldInfoList = new ArrayList();
         try {
+            Map<String, FieldInfo> tmpMap = new HashMap();
+            for (FieldInfo fieldInfo :
+                    tableInfo.getFieldList()) {
+                tmpMap.put(fieldInfo.getFieldName(), fieldInfo);
+            }
+
             ps = conn.prepareStatement(String.format(SQL_SHOW_TABLE_INDEX,tableInfo.getTableName()));
             fieldResult = ps.executeQuery();
             while (fieldResult.next()) {
@@ -177,12 +177,13 @@ public class BuildTable {
                     tableInfo.getKeyIndexMap().put(keyName, keyFieldList);
                 }
 
-                for (FieldInfo fieldInfo :
-                        tableInfo.getFieldList()) {
-                    if (fieldInfo.getFieldName().equals(columnName)) {
-                        keyFieldList.add(fieldInfo);
-                    }
-                }
+//                for (FieldInfo fieldInfo :
+//                        tableInfo.getFieldList()) {
+//                    if (fieldInfo.getFieldName().equals(columnName)) {
+//                        keyFieldList.add(fieldInfo);
+//                    }
+//                }
+                keyFieldList.add(tmpMap.get(columnName));
             }
         } catch (Exception e) {
             logger.error("读取索引失败", e);
@@ -202,7 +203,6 @@ public class BuildTable {
                 }
             }
         }
-        return fieldInfoList;
     }
 
     private static String processField(String field,Boolean upperCaseFirstLetter){
@@ -216,15 +216,15 @@ public class BuildTable {
     }
 
     private static String processJavaType(String type){
-        if (ArrayUtils.contains(Constants.SQL_INTEGER_TYPE, type)){
+        if (ArrayUtils.contains(Constants.SQL_INTEGER_TYPES, type)){
             return "Integer";
         } else if(ArrayUtils.contains(Constants.SQL_LONG_TYPE, type)){
             return "Long";
-        } else if(ArrayUtils.contains(Constants.SQL_STRING_TYPE, type)){
+        } else if(ArrayUtils.contains(Constants.SQL_STRING_TYPES, type)){
             return "String";
-        } else if(ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPE, type) || ArrayUtils.contains(Constants.SQL_DATE_TYPES, type)){
+        } else if(ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES, type) || ArrayUtils.contains(Constants.SQL_DATE_TYPE, type)){
             return "Date";
-        } else if(ArrayUtils.contains(Constants.SQL_DECIMAL_TYPE, type)){
+        } else if(ArrayUtils.contains(Constants.SQL_DECIMAL_TYPES, type)){
             return "BigDecimal";
         } else {
             throw new RuntimeException("无法识别的类型" + type);

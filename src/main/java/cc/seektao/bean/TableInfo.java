@@ -1,4 +1,4 @@
-package cc.seektao.codegenerator.bean;
+package cc.seektao.bean;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +30,10 @@ public class TableInfo {
      * 唯一索引集合
      */
     private Map<String, List<FieldInfo>> keyIndexMap = new LinkedHashMap();
+    /**
+     * 是否有日期类型
+     */
+    private Boolean havaDate;
     /**
      * 是否有时间类型
      */
@@ -85,6 +89,14 @@ public class TableInfo {
 
     public void setKeyIndexMap(Map<String, List<FieldInfo>> keyIndexMap) {
         this.keyIndexMap = keyIndexMap;
+    }
+
+    public Boolean getHavaDate() {
+        return havaDate;
+    }
+
+    public void setHavaDate(Boolean havaDate) {
+        this.havaDate = havaDate;
     }
 
     public Boolean getHavaDateTime() {
