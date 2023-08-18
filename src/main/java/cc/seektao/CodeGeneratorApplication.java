@@ -1,10 +1,7 @@
 package cc.seektao;
 
-import cc.seektao.builder.BuildBase;
-import cc.seektao.builder.BuildPo;
+import cc.seektao.builder.*;
 import cc.seektao.bean.TableInfo;
-import cc.seektao.builder.BuildPoQuery;
-import cc.seektao.builder.BuildTable;
 
 import java.util.List;
 
@@ -20,6 +17,8 @@ public class CodeGeneratorApplication {
             BuildPo.execute(tableInfo);
 
             BuildPoQuery.execute(tableInfo);
+
+            BuildMapper.execute(tableInfo);
         }
     }
 }

@@ -9,6 +9,7 @@ public class Constants {
     public static String SUFFIX_BEAN_QUERY_FUZZY;
     public static String SUFFIX_BEAN_QUERY_TIME_START;
     public static String SUFFIX_BEAN_QUERY_TIME_END;
+    public static String SUFFIX_MAPPER;
 
     // 需要忽略的属性
     public static String IGNORE_BEAN_TOJSON_FIELD;
@@ -25,6 +26,7 @@ public class Constants {
     public static String PACKAGE_UTILS;
     public static String PACKAGE_ENUMS;
     public static String PACKAGE_QUERY;
+    public static String PACKAGE_MAPPERS;
 
 
     private static String PATH_JAVA = "java";
@@ -33,6 +35,7 @@ public class Constants {
     public static String PATH_UTILS;
     public static String PATH_ENUMS;
     public static String PATH_QUERY;
+    public static String PATH_MAPPERS;
 
 
 
@@ -45,6 +48,7 @@ public class Constants {
         SUFFIX_BEAN_QUERY_FUZZY = PropertiesUtils.getString("suffix.bean.query.fuzzy");
         SUFFIX_BEAN_QUERY_TIME_START = PropertiesUtils.getString("suffix.bean.query.time.start");
         SUFFIX_BEAN_QUERY_TIME_END = PropertiesUtils.getString("suffix.bean.query.time.end");
+        SUFFIX_MAPPER = PropertiesUtils.getString("suffix.mapper");
 
         IGNORE_BEAN_TOJSON_FIELD = PropertiesUtils.getString("ignore.bean.tojson.field");
         IGNORE_BEAN_TOJSON_EXPRESSION = PropertiesUtils.getString("ignore.bean.tojson.expression");
@@ -60,14 +64,15 @@ public class Constants {
         PACKAGE_UTILS = PACKAGE_BASE + "." + PropertiesUtils.getString("package.utils");
         PACKAGE_ENUMS = PACKAGE_BASE + "." + PropertiesUtils.getString("package.enums");
         PACKAGE_QUERY = PACKAGE_BASE + "." + PropertiesUtils.getString("package.query");
+        PACKAGE_MAPPERS = PACKAGE_BASE + "." + PropertiesUtils.getString("package.mappers");
 
         PATH_BASE = PropertiesUtils.getString("path.base");
         PATH_BASE = PATH_BASE + "/" + PATH_JAVA;
-
         PATH_PO = PATH_BASE + "/" + PACKAGE_PO.replace(".", "/");
         PATH_UTILS = PATH_BASE + "/" + PACKAGE_UTILS.replace(".", "/");
         PATH_ENUMS = PATH_BASE + "/" + PACKAGE_ENUMS.replace(".", "/");
         PATH_QUERY = PATH_BASE + "/" + PACKAGE_QUERY.replace(".", "/");
+        PATH_MAPPERS = PATH_BASE + "/" + PACKAGE_MAPPERS.replace(".", "/");
 
 
     }

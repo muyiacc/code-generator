@@ -22,11 +22,15 @@ public class BuildBase {
         headerInfoList.add("package " + Constants.PACKAGE_ENUMS + ";");
         build(headerInfoList,"DateTimePatternEnum", Constants.PATH_ENUMS);
 
-        headerInfoList.clear();
-
         // 生成DateUtils类
+        headerInfoList.clear();
         headerInfoList.add("package " + Constants.PACKAGE_UTILS + ";");
         build(headerInfoList,"DateUtils", Constants.PATH_UTILS);
+
+        // 生成BaseMapper
+        headerInfoList.clear();
+        headerInfoList.add("package " + Constants.PACKAGE_MAPPERS + ";");
+        build(headerInfoList, "BaseMapper", Constants.PATH_MAPPERS);
     }
 
     public static void build(List<String> headerInfoList, String fileName, String outPutPath) {

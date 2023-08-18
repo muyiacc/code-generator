@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 
 /**
- * 读取数据库，生成po对象
+ * 读取数据库，生成po查询对象
  */
 public class BuildPoQuery {
     private static final Logger logger = LoggerFactory.getLogger(BuildPoQuery.class);
